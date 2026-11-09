@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VerifyHub Admin</title><link rel="stylesheet" href="/styles.css"></head>
+<body>
+  <div id="login" class="login-shell">
+    <form id="login-form" class="login-card">
+      <div class="brand-mark">V</div><p class="eyebrow">SECURE OPERATIONS</p><h1>VerifyHub</h1>
+      <p class="muted">Manage verification infrastructure from one place.</p>
+      <label>Admin key<input id="admin-key" type="password" autocomplete="current-password" placeholder="Enter local admin key" required></label>
+      <button type="submit" class="primary">Open dashboard</button><p id="login-error" class="error"></p>
+      <p class="hint">Local default: <code>local-admin-change-me</code></p>
+    </form>
+  </div>
+
+  <div id="app" class="app hidden">
+    <aside><div class="brand"><div class="brand-mark small">V</div><div><strong>VerifyHub</strong><span>Admin console</span></div></div>
+      <nav><button class="nav active" data-view="overview">Overview</button><button class="nav" data-view="tenants">Clients & keys</button><button class="nav" data-view="testing">API testing</button><button class="nav" data-view="audit">Audit log</button></nav>
+      <div class="aside-bottom"><span class="live-dot"></span> Local service online<button id="logout" class="link-btn">Sign out</button></div>
+    </aside>
+    <main>
+      <header><div><p class="eyebrow">VERIFICATION CONTROL PLANE</p><h1 id="page-title">Overview</h1></div><div class="mode-pill"><span></span><b id="wa-mode">Loading</b></div></header>
+      <div id="toast" class="toast hidden"></div>
+
+      <section id="view-overview" class="view">
+        <div class="stats"><article><span>Active clients</span><strong id="stat-tenants">—</strong><small>Configured tenants</small></article><article><span>OTP requests</span><strong id="stat-otp">—</strong><small>Last 24 hours</small></article><article><span>Verified</span><strong id="stat-verified">—</strong><small>Last 24 hours</small></article><article><span>GST lookups</span><strong id="stat-gst">—</strong><small>Last 24 hours</small></article></div>
+        <div class="two-col"><article class="panel"><div class="panel-head"><div><p class="eyebrow">PROVIDERS</p><h2>Connection status</h2></div></div><div class="provider"><div class="provider-icon whatsapp">W</div><div><b>WhatsApp OTP</b><span>Meta authentication messages</span></div><em id="provider-wa">—</em></div><div class="provider"><div class="provider-icon gst">G</div><div><b>GST lookup</b><span>Authorized GSP integration</span></div><em id="provider-gst">—</em></div></article>
+        <article class="panel intro"><p class="eyebrow">QUICK START</p><h2>One API for every product</h2><p>Give each client a separate API key, test requests here, and monitor activity without exposing provider credentials.</p><button class="primary" data-go="tenants">Add your first client</button></article></div>
+      </section>
+
+      <section id="view-tenants" class="view hidden"><div class="section-actions"><div><h2>Clients and API keys</h2><p class="muted">Every client is isolated and independently revocable.</p></div><button id="new-tenant" class="primary">+ New client</button></div><div class="panel table-wrap"><table><thead><tr><th>Client</th><th>Status</th><th>API keys</th><th>OTP events</th><th>Created</th><th></th></tr></thead><tbody id="tenant-rows"></tbody></table><div id="tenant-empty" class="empty hidden">No clients yet. Create one to begin.</div></div></section>
+
+      <section id="view-testing" class="view hidden"><div class="test-grid"><form id="otp-form" class="panel form-panel"><p class="eyebrow">WHATSAPP / SMS</p><h2>Send test OTP</h2><label>Client API key<input id="otp-key" placeholder="vrf_live_..." required></label><label>Phone number<input id="otp-phone" value="+919876543210" required></label><div class="row"><label>Channel<select id="otp-channel"><option>WHATSAPP</option><option>SMS</option></select></label><label>Purpose<input id="otp-purpose" value="login" required></label></div><button class="primary" type="submit">Send test OTP</button><pre id="otp-result">Response will appear here</pre></form>
+      <form id="gst-form" class="panel form-panel"><p class="eyebrow">TAXPAYER SEARCH</p><h2>Test GST lookup</h2><label>Client API key<input id="gst-key" placeholder="vrf_live_..." required></label><label>GSTIN<input id="gstin" placeholder="27ABCDE1234F1Z5" required></label><button class="primary" type="submit">Look up GSTIN</button><pre id="gst-result">Response will appear here</pre></form></div></section>
+
+      <section id="view-audit" class="view hidden"><div><h2>Recent audit activity</h2><p class="muted">The latest 50 security and lookup events.</p></div><div id="audit-list" class="timeline panel"></div></section>
+    </main>
+  </div>
+
+  <dialog id="tenant-dialog"><form id="tenant-form"><div class="dialog-head"><div><p class="eyebrow">NEW CLIENT</p><h2>Create isolated tenant</h2></div><button type="button" class="icon-btn" data-close>×</button></div><label>Company or product name<input id="tenant-name" required minlength="2" maxlength="80" placeholder="Acme Technologies"></label><p class="muted">A new API key will be generated and shown once.</p><div class="dialog-actions"><button type="button" class="secondary" data-close>Cancel</button><button type="submit" class="primary">Create client</button></div></form></dialog>
+  <dialog id="key-dialog"><div class="dialog-head"><div><p class="eyebrow">API KEY CREATED</p><h2>Copy it now</h2></div><button class="icon-btn" data-key-close>×</button></div><p class="muted">For security, this key cannot be displayed again.</p><div class="secret"><code id="new-key"></code><button id="copy-key">Copy</button></div><button class="primary full" data-key-close>Done</button></dialog>
+  <script src="/app.js"></script>
+</body></html>

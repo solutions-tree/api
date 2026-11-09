@@ -1,0 +1,42 @@
+services:
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://verify:verify@postgres:5432/verify
+      REDIS_URL: redis://redis:6379
+      OTP_PEPPER: ${OTP_PEPPER:-change-this-in-production}
+      API_KEY_PEPPER: ${API_KEY_PEPPER:-change-this-too}
+      ADMIN_KEY: ${ADMIN_KEY:-local-admin-change-me}
+      PROVIDER_MODE: ${PROVIDER_MODE:-mock}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      META_PHONE_NUMBER_ID: ${META_PHONE_NUMBER_ID:-}
+      GST_API_BASE_URL: ${GST_API_BASE_URL:-}
+      GST_API_KEY: ${GST_API_KEY:-}
+    ports: ["3000:3000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: verify
+      POSTGRES_PASSWORD: verify
+      POSTGRES_DB: verify
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verify"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: ["redis_data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  postgres_data:
+  redis_data:

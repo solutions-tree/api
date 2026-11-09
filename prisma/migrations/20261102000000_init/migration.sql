@@ -1,0 +1,10 @@
+CREATE TYPE "OtpChannel" AS ENUM ('WHATSAPP', 'SMS');
+CREATE TYPE "OtpStatus" AS ENUM ('PENDING', 'VERIFIED', 'EXPIRED', 'LOCKED', 'DELIVERY_FAILED');
+CREATE TABLE "Tenant" ("id" TEXT PRIMARY KEY, "name" TEXT NOT NULL, "active" BOOLEAN NOT NULL DEFAULT true, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);
+CREATE TABLE "ApiKey" ("id" TEXT PRIMARY KEY, "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE CASCADE, "name" TEXT NOT NULL, "prefix" TEXT NOT NULL, "keyHash" TEXT NOT NULL UNIQUE, "active" BOOLEAN NOT NULL DEFAULT true, "lastUsedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE "OtpEvent" ("id" TEXT PRIMARY KEY, "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE RESTRICT, "destinationHash" TEXT NOT NULL, "destinationTail" TEXT NOT NULL, "purpose" TEXT NOT NULL, "channel" "OtpChannel" NOT NULL, "status" "OtpStatus" NOT NULL DEFAULT 'PENDING', "providerRef" TEXT, "attempts" INTEGER NOT NULL DEFAULT 0, "expiresAt" TIMESTAMP(3) NOT NULL, "verifiedAt" TIMESTAMP(3), "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL);
+CREATE TABLE "AuditLog" ("id" TEXT PRIMARY KEY, "tenantId" TEXT NOT NULL REFERENCES "Tenant"("id") ON DELETE RESTRICT, "action" TEXT NOT NULL, "subjectId" TEXT, "metadata" JSONB, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX "ApiKey_tenantId_idx" ON "ApiKey"("tenantId");
+CREATE INDEX "OtpEvent_tenantId_createdAt_idx" ON "OtpEvent"("tenantId", "createdAt");
+CREATE INDEX "OtpEvent_destinationHash_createdAt_idx" ON "OtpEvent"("destinationHash", "createdAt");
+CREATE INDEX "AuditLog_tenantId_createdAt_idx" ON "AuditLog"("tenantId", "createdAt");
